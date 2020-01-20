@@ -1,7 +1,7 @@
 # A Python Version of Psychoacoustic Model-I (PAM-I)
 
 ## Claims:
-### [1] The PAM model is based on  
+### [1] The psychoacoustic model is based on  
 https://www.iso.org/standard/22412.html
 ### [2] The implementation is derived from 
 https://www.petitcolas.net/fabien/software/mpeg/
