@@ -11,4 +11,4 @@ https://books.google.com/books?id=tb41_XyeF4MC&pg=PA607&lpg=PA607&dq=19982.81+fr
 ## How to run:
 ### python2 calculate_global_masking_threshold.py --sample_rate 44100 --input_data './data/test_data_44.npy'
 
-![alt text](https://github.com/cocosci/pam-i-python/blob/master/pam/output/pam-1-test.png)
+![alt text](https://github.com/cocosci/pam-nac/blob/master/pam/output/pam-1-test.png)
