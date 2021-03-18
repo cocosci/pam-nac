@@ -55,13 +55,30 @@ def plot(global_psd, Tonal_list, LTt, LTn, Non_tonal_list, LTg):
              markeredgewidth=4, markeredgecolor='m', markerfacecolor='m', linestyle='None', label='tonal masker')
     plt.plot([int(i) for i in Non_tonal_list[:, 0]], [int(i) for i in Non_tonal_list[:, 1]], marker='o', markersize=8,
              markeredgecolor='k', markerfacecolor='w', linestyle='None', label='noise masker')
-    for j in range(len(Non_tonal_list[:, 0])):
-        plt.plot(TH[:, 0], LTn[j, :], 'k:', label='noise masking threshold')
+    
+
+    # handles, labels = plt.gca().get_legend_handles_labels()
+    # by_label = OrderedDict(zip(labels, handles))
+    # plt.legend(by_label.values(), by_label.keys(), fontsize='x-large', fancybox=True, framealpha=0.35, loc='best')
+    # plt.tight_layout()
+    # plt.show()
+    # fig.savefig(fname='./output/pam-1-test-0.png', dpi=100)
+
     for j in range(len(Tonal_list[:, 0])):
         plt.plot(TH[:, 0], LTt[j, :], 'm:', linewidth=3, label='tonal masking threshold')
+
+    for j in range(len(Non_tonal_list[:, 0])):
+        plt.plot(TH[:, 0], LTn[j, :], 'k:', label='noise masking threshold')
+    # handles, labels = plt.gca().get_legend_handles_labels()
+    # by_label = OrderedDict(zip(labels, handles))
+    # plt.legend(by_label.values(), by_label.keys(), fontsize='x-large', fancybox=True, framealpha=0.35, loc='best')
+    # plt.tight_layout()
+    # plt.show()    
+    # fig.savefig(fname='./output/pam-1-test-2.png', dpi=100)  
+    # 
     plt.plot(TH[:, 0], LTg, 'r-', label='global masking threshold', linewidth=2)
     plt.plot(TH[:, 0], LTq, 'r--', linewidth=3, label='absolute hearing threshold')
-
+# 
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = OrderedDict(zip(labels, handles))
     plt.legend(by_label.values(), by_label.keys(), fontsize='x-large', fancybox=True, framealpha=0.35, loc='best')
@@ -98,13 +115,14 @@ if __name__ == "__main__":
     CB, C, TH, LTq, Map = acoustic_parameter_setup(sample_rate)
 
     data = np.load(args.input_data)
+    print(data.shape)
     if len(data.shape) == 2 and data.shape[1] == 512:
         global_threshold_data = np.empty((data.shape[0], (FFT_SIZE / 2 + 1)))
         global_psd = np.empty((data.shape[0], (FFT_SIZE / 2 + 1)))
         for i in range(data.shape[0]):
-            global_psd, _, _, _, _, _, global_threshold_data = one_pass_calculation(data[i, :])
-            global_psd[i, :] = global_psd
-            global_threshold_data[i, :] = global_threshold_data
+            _global_psd, _, _, _, _, _, _global_threshold_data = one_pass_calculation(data[i, :])
+            global_psd[i, :] = _global_psd
+            global_threshold_data[i, :] = _global_threshold_data
         np.save('./output/global_threshold_data_' + str(args.sample_rate) + 'kHz.npy', global_threshold_data)
         np.save('./output/global_psd_' + str(args.sample_rate) + 'kHz.npy', global_psd)
     else:

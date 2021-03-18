@@ -6,7 +6,6 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate_tanh', type=float, help='learning_rate for training tanh NN')
     parser.add_argument('--learning_rate_greedy_followers', type=str,
                         help='learning_rate for training greedy followers NN')
-    # parser.add_argument('--learning_rate_whole_greedy_system', type=float, help='learning_rate for training the whole greedy pipeline NN')
     parser.add_argument('--epoch_tanh', type=int, help='epoch to train tanh NN.')
     parser.add_argument('--epoch_greedy_followers', type=str, help='epoch to fine tuning NN.')
     parser.add_argument('--from_where_step', type=int, help='0: from beginning; 1 from the second resnet or the first follower...')
@@ -24,11 +23,10 @@ if __name__ == "__main__":
     parser.add_argument('--res_scalar', type=float, help='res_scalar')
     parser.add_argument('--pretrain_step', type=int, help='pretrain_step')
     parser.add_argument('--target_entropy', type=float, help='target_entropy')
-    
     parser.add_argument('--num_bins_for_follower', type=str, help='num_bins_for_follower')
-    
     args = parser.parse_args()
     print(args)
+
     audio_coding_ae = CMRL(args)
     
     if args.training_mode == '1':

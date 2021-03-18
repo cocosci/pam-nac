@@ -8,6 +8,7 @@ def cal_psd(data):
     """
     data = data / np.max(np.abs(data))
     P = np.maximum(20 * ma.log10(np.abs(scipy.fftpack.fft(data)[:(FFT_SIZE/2 + 1)]) / FFT_SIZE), -200)
+    # P = np.maximum(np.abs(scipy.fftpack.fft(data)[:(FFT_SIZE / 2 + 1)])**2 / FFT_SIZE, -200)
     P = P.filled()
     P = np.reshape(P, ((FFT_SIZE/2 + 1), -1))
     Delta = 96 - np.max(P)
@@ -18,9 +19,9 @@ def cal_psd(data):
 def find_tonal_set(psd):
     """
     Description: given the input of the power spectral density, find a set of tonal maskers
-    Reference: ISO/IEC 11172-3:1993, Information technology – Coding of moving pictures 
+    Reference: ISO/IEC 11172-3:1993, Information technology Coding of moving pictures 
                 and associated audio for digital storage media at up to about 1,5 Mbit/s
-                – Part 3: Audio, with the permission of ISO.
+                Part 3: Audio, with the permission of ISO.
     """
     Flags = np.zeros(int(FFT_SIZE / 2)) + NOT_EXAMINED
     local_max_list = np.empty((0, 2))

@@ -4,9 +4,9 @@ from utilities_n_libraries import *
 def find_non_tonal_set(Flags, psd):
     """
     Description: given the psd and detected tonal maskers, find a set of non-tonal maskers
-    Reference: ISO/IEC 11172-3:1993, Information technology – Coding of moving pictures 
+    Reference: ISO/IEC 11172-3:1993, Information technology Coding of moving pictures 
                 and associated audio for digital storage media at up to about 1,5 Mbit/s
-                – Part 3: Audio, with the permission of ISO.
+                Part 3: Audio, with the permission of ISO.
     """
     Non_tonal_list = np.zeros((len(CB) - 1, 2))
     for i in range(len(CB) - 1):

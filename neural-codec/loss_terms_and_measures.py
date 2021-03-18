@@ -26,13 +26,6 @@ def mse_loss(decoded_sig, original_sig, kai_re_mat=1):
     mse = tf.reduce_mean(input_tensor=tf.square(tf.subtract(decoded_sig, original_sig)), axis=-1)
     return tf.sqrt(mse + 1e-07)
 
-# def mse_loss(decoded_sig, original_sig, kai_re_mat=1):
-#     mse_real_part = tf.reduce_mean(input_tensor=tf.square(tf.subtract(tf_stft_real_log10(decoded_sig),
-#                                                                       tf_stft_real_log10(original_sig))), axis=-1)
-#     mse_imag_part = tf.reduce_mean(input_tensor=tf.square(tf.subtract(tf_stft_imag_log10(decoded_sig),
-#                                                                       tf_stft_imag_log10(original_sig))), axis=-1)
-#     return tf.sqrt(mse_real_part + mse_imag_part + 1e-07)
-
 
 def mfcc_transform(the_stft, the_spectrum, is_finetuning=False):
     """
@@ -133,16 +126,7 @@ def smr_loss(decoded_sig, original_sig, GMS):
 def nmr_max_mean_loss(decoded_sig, original_sig, GMS, the_frame_length=frame_length):
     GMS_psd = log_psd_to_psd(GMS)  # converted back to just spectral density, not in log scale.
     diff_psd, diff_spectrograms = tf_psd(decoded_sig - original_sig)
-    # cb_err = []
-    # for i in range(20, len(sub_band)):
-    #     error = tf.reduce_mean(tf.transpose(tf.gather_nd(tf.transpose(log_psd_to_psd(diff_psd)), sub_band[i])) /
-    #                           tf.transpose(tf.gather_nd(tf.transpose(GMS_psd), sub_band[i])))
-    #     cb_err.append(error)
-    #mse = tf.reduce_max(input_tensor=log_psd_to_psd(diff_psd)/GMS_psd, axis=-1) - \
-    #      1 * tf.reduce_mean(input_tensor=log_psd_to_psd(diff_psd)/GMS_psd, axis=-1)
-
     mse = tf.reduce_max(input_tensor=tf.nn.relu(log_psd_to_psd(diff_psd) / GMS_psd - 1), axis=-1)
-    # mse = 2 * tf.reduce_max(input_tensor=cb_err, axis=-1) + tf.reduce_mean(input_tensor=cb_err, axis=-1)
     return mse
 
 
