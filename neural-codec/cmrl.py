@@ -17,7 +17,7 @@ class CMRL(AudioCodingAE):
         super(CMRL, self).__init__(arg)
         self._num_resnets = arg.num_resnets
         self._from_where_step = int(arg.from_where_step)
-        self._learning_rate_greedy_followers = list(map(lambda x: float(x), arg.learning_rate_greedy_followers.split()))
+        self._learning_rate_followers = list(map(lambda x: float(x), arg.learning_rate_followers.split()))
 
     def _greedy_followers(self, num_res):
         # This function trains the second AE on top of the first AE.
@@ -72,13 +72,13 @@ class CMRL(AudioCodingAE):
                 ent_loss = entropy_coding_loss(_softmax_assignment, self._the_strides[1])
                 interested_var = [time_loss, freq_loss, quantization_loss, alpha, ent_loss, ent_loss, ent_loss, encoded]
 
-                loss2_no_quan = self._coeff_term[0] * time_loss + \
-                                self._coeff_term[1] * freq_loss
-                loss2_quan_init = self._coeff_term[0] * time_loss + \
-                                  self._coeff_term[1] * freq_loss + \
-                                  self._coeff_term[2] * smr_loss(decoded, x_[:, :, 0], mat) + \
-                                  self._coeff_term[3] * (nmr_max_mean_loss(decoded, x_[:, :, 0], mat)) + \
-                                  self._coeff_term[4] * quantization_loss + tau * ent_loss
+                loss2_no_quan = self._loss_coeff[0] * time_loss + \
+                                self._loss_coeff[1] * freq_loss
+                loss2_quan_init = self._loss_coeff[0] * time_loss + \
+                                  self._loss_coeff[1] * freq_loss + \
+                                  self._loss_coeff[2] * smr_loss(decoded, x_[:, :, 0], mat) + \
+                                  self._loss_coeff[3] * (nmr_max_mean_loss(decoded, x_[:, :, 0], mat)) + \
+                                  self._loss_coeff[4] * quantization_loss + tau * ent_loss
                 trainop2_no_quan = tf.compat.v1.train.AdamOptimizer(lr, beta2=0.999).\
                     minimize(loss2_no_quan,
                              var_list=tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES,
@@ -99,11 +99,11 @@ class CMRL(AudioCodingAE):
                                     quan_loss=quan_loss, ent_loss=ent_loss, trainop2_list=trainop2_list,
                                     decoded=decoded, alpha=alpha,
                                     bins=bins, saver=saver,
-                                    the_learning_rate=self._learning_rate_greedy_followers[-2],
-                                    epoch=self._epoch_greedy_followers[-2],
+                                    the_learning_rate=self._learning_rate_followers[-2],
+                                    epoch=self._epoch_followers[-2],
                                     flag='the_follower', interested_var=interested_var,
                                     save_id='follower_' + str(num_res - 1) + self._suffix,
-                                    the_tau_val=self._coeff_term[5] * 1)
+                                    the_tau_val=self._loss_coeff[5] * 1)
 
     def all_modules_feedforward(self):
         x, x_, lr, the_share = self.init_placeholder_end_to_end()
@@ -290,14 +290,14 @@ class CMRL(AudioCodingAE):
                         quantization_loss = quan_loss(_softmax_assignment)
                         ent_loss = entropy_coding_loss(_softmax_assignment, self._the_strides[1])
                         interested_var = [time_loss, freq_loss, quantization_loss, alpha, ent_loss, ent_loss, encoded]
-                        loss2_no_quan = self._coeff_term[0] * time_loss +\
-                                        self._coeff_term[1] * freq_loss
+                        loss2_no_quan = self._loss_coeff[0] * time_loss +\
+                                        self._loss_coeff[1] * freq_loss
 
-                        loss2_quan_init = self._coeff_term[0] * time_loss + \
-                                          self._coeff_term[1] * freq_loss + \
-                                          self._coeff_term[2] * smr_loss(decoded, x_[:, :, 0], mat) + \
-                                          self._coeff_term[3] * (nmr_max_mean(decoded, x_[:, :, 0], mat)) + \
-                                          self._coeff_term[4] * quantization_loss + tau * ent_loss
+                        loss2_quan_init = self._loss_coeff[0] * time_loss + \
+                                          self._loss_coeff[1] * freq_loss + \
+                                          self._loss_coeff[2] * smr_loss(decoded, x_[:, :, 0], mat) + \
+                                          self._loss_coeff[3] * (nmr_max_mean(decoded, x_[:, :, 0], mat)) + \
+                                          self._loss_coeff[4] * quantization_loss + tau * ent_loss
 
                         trainop2_no_quan = tf.compat.v1.train.AdamOptimizer(lr, beta2=0.999).\
                             minimize(loss2_no_quan,
@@ -318,11 +318,11 @@ class CMRL(AudioCodingAE):
                                                 quan_loss=quan_loss, ent_loss=ent_loss, trainop2_list=trainop2_list,
                                                 decoded=decoded, alpha=alpha,
                                                 bins=bins, saver=saver,
-                                                the_learning_rate=self._learning_rate_greedy_followers[-2],
-                                                epoch=self._epoch_greedy_followers[-2],
+                                                the_learning_rate=self._learning_rate_followers[-2],
+                                                epoch=self._epoch_followers[-2],
                                                 flag='the_follower', interested_var=interested_var,
                                                 save_id='follower_0_finetuning' + self._suffix,
-                                                the_tau_val=self._coeff_term[5] * 1)
+                                                the_tau_val=self._loss_coeff[5] * 1)
 
                 elif self._from_where_step == 0:
                     self._rand_model_id = arg.base_model_id
@@ -358,14 +358,14 @@ class CMRL(AudioCodingAE):
                             # interested_var = [time_loss, freq_loss, quantization_loss, alpha, ent_loss_fully, ent_loss_fully, ent_loss_fully, encoded]
                             # FOR TWO RESNETS!
                             if self._num_resnets == 2:
-                                loss2_no_quan = self._coeff_term[0] * time_loss + \
-                                                self._coeff_term[1] * freq_loss
+                                loss2_no_quan = self._loss_coeff[0] * time_loss + \
+                                                self._loss_coeff[1] * freq_loss
 
-                                loss2_quan_init = self._coeff_term[0] * time_loss + \
-                                                  self._coeff_term[1] * freq_loss + \
-                                                  self._coeff_term[2] * smr_loss(decoded, x_[:, :, 0], mat) + \
-                                                  self._coeff_term[3] * (nmr_max_mean(decoded, x_[:, :, 0], mat)) + \
-                                                  self._coeff_term[4] * quantization_loss + tau * ent_loss
+                                loss2_quan_init = self._loss_coeff[0] * time_loss + \
+                                                  self._loss_coeff[1] * freq_loss + \
+                                                  self._loss_coeff[2] * smr_loss(decoded, x_[:, :, 0], mat) + \
+                                                  self._loss_coeff[3] * (nmr_max_mean(decoded, x_[:, :, 0], mat)) + \
+                                                  self._loss_coeff[4] * quantization_loss + tau * ent_loss
 
                                 trainop2_no_quan = tf.compat.v1.train.AdamOptimizer(lr, beta2=0.999).minimize(
                                     loss2_no_quan, var_list=tf.compat.v1.trainable_variables())
@@ -382,11 +382,11 @@ class CMRL(AudioCodingAE):
                                                     quan_loss=quan_loss, ent_loss=ent_loss, trainop2_list=trainop2_list,
                                                     decoded=decoded, alpha=alpha,
                                                     bins=bins_1, saver=saver,
-                                                    the_learning_rate=self._learning_rate_greedy_followers[-1],
-                                                    epoch=self._epoch_greedy_followers[-1],
+                                                    the_learning_rate=self._learning_rate_followers[-1],
+                                                    epoch=self._epoch_followers[-1],
                                                     flag='finetuning', interested_var=interested_var,
                                                     save_id='follower_all' + self._suffix,
-                                                    the_tau_val=self._coeff_term[5])
+                                                    the_tau_val=self._loss_coeff[5])
                 else:
                     self._rand_model_id = arg.base_model_id
                     with tf.Graph().as_default():
@@ -412,14 +412,14 @@ class CMRL(AudioCodingAE):
                                               ent_loss, ent_loss_fully]
 
                             # FOR TWO RESNETS!
-                            loss2_no_quan = self._coeff_term[0] * time_loss + \
-                                            self._coeff_term[1] * freq_loss
+                            loss2_no_quan = self._loss_coeff[0] * time_loss + \
+                                            self._loss_coeff[1] * freq_loss
 
-                            loss2_quan_init = self._coeff_term[0] * time_loss + \
-                                              self._coeff_term[1] * freq_loss + \
-                                              self._coeff_term[2] * smr_loss(decoded, x_[:, :, 0], mat) + \
-                                              self._coeff_term[3] * (nmr_max_mean(decoded, x_[:, :, 0], mat)) + \
-                                              self._coeff_term[4] * quantization_loss + tau * ent_loss
+                            loss2_quan_init = self._loss_coeff[0] * time_loss + \
+                                              self._loss_coeff[1] * freq_loss + \
+                                              self._loss_coeff[2] * smr_loss(decoded, x_[:, :, 0], mat) + \
+                                              self._loss_coeff[3] * (nmr_max_mean(decoded, x_[:, :, 0], mat)) + \
+                                              self._loss_coeff[4] * quantization_loss + tau * ent_loss
                             trainop2_no_quan = tf.compat.v1.train.AdamOptimizer(lr, beta2=0.999).minimize(
                                 loss2_no_quan, var_list=tf.compat.v1.trainable_variables())
                             trainop2_quan_init = tf.compat.v1.train.AdamOptimizer(lr, beta2=0.999).minimize(
@@ -436,8 +436,8 @@ class CMRL(AudioCodingAE):
                                                 quan_loss=quan_loss, ent_loss=ent_loss, trainop2_list=trainop2_list,
                                                 decoded=decoded, alpha=alpha,
                                                 bins=bins_1, saver=saver,
-                                                the_learning_rate=self._learning_rate_greedy_followers[-1],
-                                                epoch=self._epoch_greedy_followers[-1],
+                                                the_learning_rate=self._learning_rate_followers[-1],
+                                                epoch=self._epoch_followers[-1],
                                                 flag='finetuning', interested_var=interested_var,
                                                 save_id='follower_all' + self._suffix,
-                                                the_tau_val=self._coeff_term[5])
+                                                the_tau_val=self._loss_coeff[5])

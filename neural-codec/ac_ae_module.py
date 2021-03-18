@@ -33,8 +33,8 @@ class AudioCodingAE(object):
     """
     def __init__(self, arg):
         self._root_path = '/N/u/zhenk/BNN/libsdae-autoencoder-tensorflow/'
-        self._learning_rate_tanh = arg.learning_rate_tanh
-        self._coeff_term = list(map(lambda x: float(x), arg.coeff_term.split()))
+        self._learning_rate = arg.learning_rate
+        self._loss_coeff = list(map(lambda x: float(x), arg.loss_coeff.split()))
         self._pretrain_step = arg.pretrain_step
         self._target_entropy = arg.target_entropy
         self._the_strides = list(map(lambda x: int(x), arg.the_strides.split()))
@@ -58,8 +58,8 @@ class AudioCodingAE(object):
         self._tr_data = tr_data
         self._weighting_mat = weighting_mat
 
-        self._epoch_tanh = arg.epoch_tanh
-        self._epoch_greedy_followers = list(map(lambda x: int(x), arg.epoch_greedy_followers.split()))
+        self._epoch = arg.epoch
+        self._epoch_followers = list(map(lambda x: int(x), arg.epoch_followers.split()))
         self._batch_size = arg.batch_size
         self._training_mode = int(arg.training_mode)
         self._iter_per_batch = self._tr_data.shape[0] // self._batch_size
@@ -516,14 +516,14 @@ class AudioCodingAE(object):
             quantization_loss = quan_loss(_softmax_assignment)
             ent_loss = entropy_coding_loss(_softmax_assignment)
 
-            loss_no_quan = self._coeff_term[0] * time_loss + \
-                           self._coeff_term[1] * freq_loss
+            loss_no_quan = self._loss_coeff[0] * time_loss + \
+                           self._loss_coeff[1] * freq_loss
 
-            loss_quan_init = self._coeff_term[0] * time_loss +\
-                             self._coeff_term[1] * freq_loss + \
-                             self._coeff_term[2] * smr_loss(decoded, x_[:, :, 0], mat) +\
-                             self._coeff_term[3] * (nmr_max_mean_loss(decoded, x_[:, :, 0], mat)) + \
-                             self._coeff_term[4] * quantization_loss + tau * ent_loss
+            loss_quan_init = self._loss_coeff[0] * time_loss +\
+                             self._loss_coeff[1] * freq_loss + \
+                             self._loss_coeff[2] * smr_loss(decoded, x_[:, :, 0], mat) +\
+                             self._loss_coeff[3] * (nmr_max_mean_loss(decoded, x_[:, :, 0], mat)) + \
+                             self._loss_coeff[4] * quantization_loss + tau * ent_loss
 
             trainop2_no_quan = tf.compat.v1.train.AdamOptimizer(lr, beta2=0.999).\
                 minimize(loss_no_quan,
@@ -541,6 +541,6 @@ class AudioCodingAE(object):
                                     quan_loss=quan_loss, ent_loss=ent_loss, trainop2_list=trainop2_list,
                                     decoded=decoded, alpha=alpha,
                                     bins=bins, saver=saver,
-                                    the_learning_rate=self._learning_rate_tanh, epoch=self._epoch_tanh,
+                                    the_learning_rate=self._learning_rate, epoch=self._epoch,
                                     flag='pretrain', interested_var=interested_var, save_id='',
-                                    the_tau_val=self._coeff_term[5])
+                                    the_tau_val=self._loss_coeff[5])
