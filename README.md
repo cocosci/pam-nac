@@ -1,10 +1,13 @@
 # A Python Version of Psychoacoustic Model-I (PAM-I)
 
-### [1] The psychoacoustic model is based on  
+### [1] Our paper, entitled “Psychoacoustic Calibration of Loss Functions for Efficient End-to-End Neural Audio Coding,” was accepted for publication at IEEE Signal Processing Letters. 
+https://saige.sice.indiana.edu/wp-content/uploads/spl2020_kzhen.pdf
+### [2] Demo page: https://www.kaizhen.us/neural-audio-coding
+### [3] The psychoacoustic model is based on  
 https://www.iso.org/standard/22412.html
-### [2] The implementation is derived from 
+### [4] The implementation is derived from 
 https://www.petitcolas.net/fabien/software/mpeg/
-### [3] It supports both 44100 Hz and 32000 Hz. The corresponding MPEG tables are from 
+### [5] It supports both 44100 Hz and 32000 Hz. The corresponding MPEG tables are from 
 https://books.google.com/books?id=tb41_XyeF4MC&pg=PA607&lpg=PA607&dq=19982.81+frequency&source=bl&ots=W-PAtFj9K_&sig=ACfU3U3AUtD71CM_jo7UrGGPpMLeTknYqw&hl=en&sa=X&ved=2ahUKEwinkZ6-gafmAhURPa0KHZWrBOwQ6AEwAHoECAoQAQ#v=onepage&q&f=false
 
 ## How to run:
